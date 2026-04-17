@@ -21,16 +21,25 @@
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255,255,255,0.9); z-index: 9999; justify-content: center; align-items: center; flex-direction: column;
         }
-        /* ปรับแต่งให้แสดงภาพเต็มโดยไม่โดน Crop */
-        .img-contain {
+        /* แสดงภาพเต็มสัดส่วน ไม่โดน Crop */
+        .img-full-view {
             width: 100%;
-            height: 100%;
-            object-fit: contain; /* แสดงภาพเต็มขนาดในกรอบ */
-            background-color: #f3f4f6;
+            height: auto;
+            max-height: 500px; /* จำกัดความสูงสูงสุดในหน้า preview */
+            object-fit: contain;
+            background-color: #f8fafc;
             cursor: pointer;
+            border-radius: 0.75rem;
         }
         .task-card { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* สไตล์พิเศษสำหรับภาพขยาย */
+        .swal2-image-custom {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            max-width: 100% !important;
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -43,8 +52,8 @@
     <header class="bg-blue-900 text-white p-4 shadow-lg sticky top-0 z-50">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <div>
-                <h1 class="font-bold text-lg">ระบบอนุมัติย้ายสิ่งของ</h1>
-                <p id="approverDisplay" class="text-[10px] opacity-80">ตรวจสอบสิทธิ์การเข้าใช้งาน...</p>
+                <h1 class="font-bold text-lg leading-none mb-1">ระบบอนุมัติย้ายสิ่งของ</h1>
+                <p id="approverDisplay" class="text-[10px] opacity-80 uppercase tracking-wider">Authentication Required</p>
             </div>
             <img id="userImg" class="w-10 h-10 rounded-full border-2 border-white shadow-sm" src="https://via.placeholder.com/40">
         </div>
@@ -62,15 +71,15 @@
             </div>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase">รหัสผ่าน (Profile Code)</label>
-                    <input type="password" id="regPass" class="w-full p-4 border rounded-xl mt-1 focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-mono" placeholder="••••••">
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">รหัสผ่าน (Profile Code)</label>
+                    <input type="password" id="regPass" class="w-full p-4 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-mono text-center" placeholder="••••••">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase">อีเมลแจ้งเตือน</label>
-                    <input type="email" id="regEmail" class="w-full p-4 border rounded-xl mt-1 focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50" placeholder="yourname@hrientec.com">
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">อีเมลแจ้งเตือน</label>
+                    <input type="email" id="regEmail" class="w-full p-4 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 text-center" placeholder="yourname@hrientec.com">
                 </div>
                 <button onclick="register()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 active:scale-95 transition-all mt-4">
-                    <i class="fas fa-check-circle mr-2"></i> ลงทะเบียนสวมสิทธิ์
+                    <i class="fas fa-id-badge mr-2"></i> ยืนยันสวมสิทธิ์ผู้อนุมัติ
                 </button>
             </div>
         </div>
@@ -78,17 +87,17 @@
         <!-- Section 1: Approval Card -->
         <div id="approvalSection" class="hidden space-y-4">
             <div id="taskContent" class="space-y-4">
-                <!-- รายการจะถูกแทรกที่นี่ -->
+                <!-- Task items will be inserted here -->
             </div>
             
             <div id="noTask" class="hidden text-center py-24">
-                <div class="bg-green-50 text-green-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-100">
-                    <i class="fas fa-clipboard-check text-4xl"></i>
+                <div class="bg-blue-50 text-blue-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-100">
+                    <i class="fas fa-tasks text-3xl"></i>
                 </div>
                 <h3 class="text-lg font-bold text-gray-800">ไม่มีรายการค้างอนุมัติ</h3>
-                <p class="text-gray-400 text-sm">คุณได้จัดการรายการทั้งหมดเรียบร้อยแล้ว</p>
-                <button onclick="fetchTask()" class="mt-8 bg-blue-600 text-white px-8 py-2.5 rounded-full font-bold shadow-md active:scale-95 transition">
-                    <i class="fas fa-sync-alt mr-2"></i> ตรวจสอบอีกครั้ง
+                <p class="text-gray-400 text-xs">คุณได้จัดการรายการทั้งหมดในคิวเรียบร้อยแล้ว</p>
+                <button onclick="fetchTask()" class="mt-8 bg-blue-600 text-white px-8 py-3 rounded-full font-bold shadow-lg active:scale-95 transition">
+                    <i class="fas fa-redo-alt mr-2"></i> รีเฟรชรายการ
                 </button>
             </div>
         </div>
@@ -121,7 +130,7 @@
                 await checkUser();
             } catch (err) {
                 console.error(err);
-                Swal.fire('Error', 'การเชื่อมต่อขัดข้อง: ' + err, 'error');
+                Swal.fire('Error', 'ไม่สามารถเชื่อมต่อ LINE: ' + err, 'error');
             } finally {
                 showLoading(false);
             }
@@ -143,7 +152,7 @@
         async function register() {
             const pass = document.getElementById('regPass').value.trim();
             const email = document.getElementById('regEmail').value.trim();
-            if (!pass || !email) return Swal.fire('เตือน', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'warning');
+            if (!pass || !email) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอกรหัสผ่านและอีเมล', 'warning');
 
             showLoading(true);
             const res = await callApi({
@@ -160,7 +169,7 @@
                     icon: 'success',
                     title: 'สวมสิทธิ์สำเร็จ',
                     text: `เข้าใช้งานในชื่อคุณ ${res.approverName}`,
-                    timer: 2000,
+                    timer: 1500,
                     showConfirmButton: false
                 }).then(checkUser);
             } else {
@@ -190,34 +199,34 @@
             const container = document.getElementById('taskContent');
             
             let itemsHtml = task.details.map((item, idx) => {
-                // ใช้ sz=w600 เพื่อให้ภาพพรีวิวชัดเจนขึ้น และใช้ object-contain เพื่อแสดงครบทั้งภาพ
+                // ใช้ sz=w400 สำหรับหน้าพรีวิวเพื่อความเร็วในการโหลด
                 const thumbUrl = item.photoId ? `https://drive.google.com/thumbnail?id=${item.photoId}&sz=w600` : '';
                 
                 return `
-                <div class="p-3 bg-white rounded-xl border border-gray-100 shadow-sm space-y-3">
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-3">
                     <div class="flex items-center space-x-3">
-                        <div class="bg-blue-700 text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0">
+                        <div class="bg-blue-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0">
                             ${item.qty}
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-bold text-gray-800 leading-tight">${item.description}</p>
-                            <p class="text-[9px] text-gray-400 font-semibold uppercase tracking-wider">Owner: ${item.owner}</p>
+                            <p class="text-sm font-bold text-gray-800 leading-none mb-1">${item.description}</p>
+                            <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wide">Owner: ${item.owner}</p>
                         </div>
                     </div>
                     ${item.photoId ? `
-                        <div class="relative w-full h-56 bg-gray-100 rounded-lg overflow-hidden border border-gray-100">
+                        <div class="relative group">
                             <img src="${thumbUrl}" 
-                                 class="img-contain" 
+                                 class="img-full-view border border-gray-100" 
                                  onclick="previewFullImage('${item.photoId}')"
                                  onerror="this.src='https://via.placeholder.com/400x300?text=ไม่มีรูปภาพ'">
-                            <div class="absolute bottom-2 right-2 bg-black/50 text-white px-2 py-1 rounded-md text-[9px] backdrop-blur-sm">
-                                <i class="fas fa-expand-alt mr-1"></i> ดูภาพขนาดเต็ม
+                            <div class="absolute bottom-2 right-2 bg-black/60 text-white px-3 py-1.5 rounded-lg text-[9px] font-bold backdrop-blur-sm flex items-center">
+                                <i class="fas fa-expand mr-1.5"></i> แตะเพื่อขยายรูปภาพ
                             </div>
                         </div>
                     ` : `
-                        <div class="py-6 bg-gray-50 rounded-lg text-center border border-dashed border-gray-200">
-                            <i class="fas fa-camera-slash text-gray-300 text-xl mb-1"></i>
-                            <p class="text-[10px] text-gray-400">ไม่มีรูปภาพประกอบ</p>
+                        <div class="py-10 bg-gray-50 rounded-xl text-center border-2 border-dashed border-gray-100">
+                            <i class="fas fa-camera text-gray-200 text-2xl mb-2"></i>
+                            <p class="text-[10px] text-gray-300 font-bold">ไม่มีรูปภาพประกอบรายการ</p>
                         </div>
                     `}
                 </div>
@@ -225,62 +234,78 @@
             }).join('');
 
             container.innerHTML = `
-                <div class="task-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
-                    <div class="bg-blue-900 p-4 text-white">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded font-mono">#${task.docno}</span>
-                            <span class="text-[10px]"><i class="far fa-clock mr-1"></i>${task.docdate}</span>
-                        </div>
-                        <h2 class="text-lg font-bold leading-tight">${task.transType}</h2>
-                    </div>
-                    
-                    <div class="p-4 space-y-5">
-                        <div class="grid grid-cols-2 gap-x-4 gap-y-4 text-sm">
-                            <div><label class="text-gray-400 text-[9px] font-bold block mb-0.5 uppercase tracking-tighter">ผู้ขออนุญาต</label><p class="font-bold text-gray-800">${task.reqName}</p></div>
-                            <div><label class="text-gray-400 text-[9px] font-bold block mb-0.5 uppercase tracking-tighter">แผนก/หน่วยงาน</label><p class="font-bold text-gray-800">${task.reqCompany}</p></div>
-                            <div><label class="text-gray-400 text-[9px] font-bold block mb-0.5 uppercase tracking-tighter">ทะเบียนรถ</label><p class="font-bold text-gray-800">${task.carNo}</p></div>
-                            <div><label class="text-gray-400 text-[9px] font-bold block mb-0.5 uppercase tracking-tighter">ประเภทรถ</label><p class="font-bold text-gray-800">${task.carType}</p></div>
-                            <div class="col-span-2 bg-blue-50/50 p-3 rounded-xl border border-blue-100/50">
-                                <label class="text-blue-400 text-[9px] font-bold block mb-1 uppercase tracking-tighter">วัตถุประสงค์การเคลื่อนย้าย</label>
-                                <p class="text-gray-700 text-sm leading-snug font-medium">${task.purpose}</p>
+                <div class="task-card space-y-4">
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                        <div class="bg-blue-900 p-5 text-white">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-[10px] bg-white/20 px-3 py-1 rounded-full font-mono font-bold tracking-widest">DOC: ${task.docno}</span>
+                                <span class="text-[10px] opacity-80 font-bold"><i class="far fa-clock mr-1"></i>${task.docdate}</span>
                             </div>
+                            <h2 class="text-xl font-bold leading-tight">${task.transType}</h2>
                         </div>
                         
-                        <div>
-                            <h4 class="text-xs font-black text-blue-900 mb-3 uppercase flex items-center tracking-widest">
-                                <i class="fas fa-layer-group mr-2"></i> รายการสิ่งของ (${task.details.length})
-                            </h4>
-                            <div class="space-y-4">${itemsHtml}</div>
+                        <div class="p-5 space-y-6">
+                            <div class="grid grid-cols-2 gap-x-6 gap-y-5 text-sm">
+                                <div><label class="text-gray-400 text-[9px] font-black block mb-1 uppercase tracking-wider">ผู้ขออนุญาต</label><p class="font-bold text-gray-800">${task.reqName}</p></div>
+                                <div><label class="text-gray-400 text-[9px] font-black block mb-1 uppercase tracking-wider">แผนก/หน่วยงาน</label><p class="font-bold text-gray-800">${task.reqCompany}</p></div>
+                                <div><label class="text-gray-400 text-[9px] font-black block mb-1 uppercase tracking-wider">ทะเบียนรถ</label><p class="font-bold text-gray-800">${task.carNo}</p></div>
+                                <div><label class="text-gray-400 text-[9px] font-black block mb-1 uppercase tracking-wider">ประเภทรถ</label><p class="font-bold text-gray-800">${task.carType}</p></div>
+                                <div class="col-span-2 bg-blue-50/40 p-4 rounded-2xl border border-blue-100/30">
+                                    <label class="text-blue-500 text-[9px] font-black block mb-1 uppercase tracking-wider">วัตถุประสงค์</label>
+                                    <p class="text-gray-700 text-sm leading-snug font-medium">${task.purpose}</p>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 class="text-[10px] font-black text-blue-900 mb-4 uppercase flex items-center tracking-[0.2em]">
+                                    <i class="fas fa-list-ul mr-2 text-xs"></i> รายการสิ่งของ (${task.details.length})
+                                </h4>
+                                <div class="space-y-4">${itemsHtml}</div>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="p-4 bg-gray-50 border-t grid grid-cols-2 gap-3">
-                        <button onclick="approveAction('${task.docno}', 'Rejected')" class="bg-white border-2 border-red-500 text-red-600 font-bold py-4 rounded-xl active:scale-95 transition-all text-sm">
-                            <i class="fas fa-times mr-1"></i> ไม่อนุมัติ
+                    <div class="grid grid-cols-2 gap-4 pb-6 px-1">
+                        <button onclick="approveAction('${task.docno}', 'Rejected')" class="bg-white border-2 border-red-500 text-red-600 font-bold py-5 rounded-2xl shadow-sm active:scale-95 transition-all flex flex-col items-center">
+                            <i class="fas fa-times-circle text-lg mb-1"></i>
+                            <span class="text-sm">ไม่อนุมัติ</span>
                         </button>
-                        <button onclick="approveAction('${task.docno}', 'Approved')" class="bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-all text-sm">
-                            <i class="fas fa-check mr-1"></i> อนุมัติ
+                        <button onclick="approveAction('${task.docno}', 'Approved')" class="bg-green-600 text-white font-bold py-5 rounded-2xl shadow-xl active:scale-95 transition-all flex flex-col items-center">
+                            <i class="fas fa-check-circle text-lg mb-1"></i>
+                            <span class="text-sm font-bold">อนุมัติรายการ</span>
                         </button>
                     </div>
                 </div>
             `;
         }
 
-        // ปรับปรุงฟังก์ชันขยายรูปภาพให้เรียกไฟล์ตรงและแสดงผลแบบ Popup
+        // ฟังก์ชันขยายรูปภาพ - ปรับปรุงให้รองรับ LINE Browser
         function previewFullImage(id) {
+            // ใช้ uc สำหรับแสดงภาพขนาดเต็ม
             const fullUrl = `https://drive.google.com/uc?id=${id}`;
+            
             Swal.fire({
-                html: `<div class="p-0 overflow-hidden rounded-lg">
-                         <img src="${fullUrl}" style="max-width:100%; height:auto; border-radius:8px;" onerror="this.src='https://via.placeholder.com/800x600?text=Error+Loading+Image'">
-                         <div class="mt-4 flex justify-center">
-                            <a href="${fullUrl}" target="_blank" class="text-xs text-blue-500 underline"><i class="fas fa-external-link-alt mr-1"></i>เปิดในหน้าต่างใหม่</a>
+                html: `<div class="p-0 m-0 overflow-hidden bg-black flex flex-col items-center justify-center min-h-[50vh]">
+                         <img src="${fullUrl}" class="max-w-full h-auto block" 
+                              style="border-radius:0;" 
+                              onerror="this.src='https://via.placeholder.com/800x600?text=พบข้อผิดพลาดในการโหลดรูป'">
+                         <div class="p-4 w-full bg-white flex justify-center border-t">
+                            <a href="${fullUrl}" target="_blank" class="bg-blue-600 text-white px-4 py-2 rounded-full text-xs font-bold no-underline flex items-center">
+                                <i class="fas fa-external-link-alt mr-2"></i> เปิดดูไฟล์ต้นฉบับ
+                            </a>
                          </div>
                        </div>`,
                 showConfirmButton: false,
                 showCloseButton: true,
-                width: '95%',
-                background: '#fff',
-                padding: '10px'
+                width: '100%',
+                margin: '0',
+                padding: '0',
+                background: '#000',
+                backdrop: `rgba(0,0,0,0.95)`,
+                customClass: {
+                    popup: 'rounded-none overflow-hidden',
+                    htmlContainer: 'p-0 m-0'
+                }
             });
         }
 
@@ -288,13 +313,17 @@
             const isApproved = status === 'Approved';
             const result = await Swal.fire({
                 title: isApproved ? 'ยืนยันอนุมัติ?' : 'ปฏิเสธคำขอ?',
-                text: `คุณกำลังตัดสินใจ ${isApproved ? 'อนุมัติ' : 'ไม่อนุมัติ'} รายการ ${docno}`,
+                text: `คุณกำลังดำเนินการ ${isApproved ? 'อนุมัติ' : 'ไม่อนุมัติ'} รายการ ${docno}`,
                 icon: isApproved ? 'question' : 'warning',
                 showCancelButton: true,
                 confirmButtonColor: isApproved ? '#059669' : '#dc2626',
                 cancelButtonText: 'ยกเลิก',
-                confirmButtonText: 'ยืนยันดำเนินการ',
-                reverseButtons: true
+                confirmButtonText: 'ยืนยัน',
+                reverseButtons: true,
+                customClass: {
+                    confirmButton: 'rounded-xl px-8 py-3',
+                    cancelButton: 'rounded-xl px-8 py-3'
+                }
             });
 
             if (result.isConfirmed) {
@@ -306,7 +335,7 @@
                         icon: 'success', 
                         title: 'บันทึกสำเร็จ', 
                         showConfirmButton: false, 
-                        timer: 1000,
+                        timer: 1200,
                         toast: true,
                         position: 'top-end'
                     });
@@ -326,7 +355,7 @@
                 return await response.json();
             } catch (err) {
                 console.error(err);
-                return { status: 'error', message: 'การเชื่อมต่อเซิร์ฟเวอร์ล้มเหลว' };
+                return { status: 'error', message: 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้' };
             }
         }
 
