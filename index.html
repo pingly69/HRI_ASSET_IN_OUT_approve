@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>ระบบอนุมัติ - Property Pass</title>
@@ -18,15 +18,17 @@
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255,255,255,0.9); z-index: 9999; justify-content: center; align-items: center; flex-direction: column;
         }
-        .img-preview { cursor: pointer; transition: transform 0.2s; }
+        .img-preview { cursor: pointer; transition: transform 0.2s; border: 1px solid #e2e8f0; }
         .img-preview:active { transform: scale(0.95); }
+        .task-card { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="min-h-screen">
 
     <div id="loading" class="loading-overlay">
         <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-600 mb-4"></div>
-        <p class="text-gray-600">กำลังประมวลผล...</p>
+        <p class="text-gray-600 font-semibold">กำลังประมวลผล...</p>
     </div>
 
     <header class="bg-blue-900 text-white p-4 shadow-lg sticky top-0 z-50">
@@ -43,20 +45,24 @@
         <!-- Section 0: Registration Form -->
         <div id="regSection" class="hidden bg-white rounded-2xl shadow-xl p-6 mt-10">
             <div class="text-center mb-6">
-                <i class="fas fa-user-shield text-5xl text-blue-600 mb-4"></i>
-                <h2 class="text-xl font-bold">ลงทะเบียนผู้อนุมัติ</h2>
-                <p class="text-gray-500 text-sm">กรุณาระบุรหัสผ่านและอีเมลเพื่อเริ่มใช้งาน</p>
+                <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user-shield text-4xl text-blue-600"></i>
+                </div>
+                <h2 class="text-xl font-bold text-gray-800">ลงทะเบียนผู้อนุมัติ</h2>
+                <p class="text-gray-500 text-sm">กรุณาระบุรหัสผ่านและอีเมลเพื่อยืนยันตัวตน</p>
             </div>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700">รหัสผ่าน (จากระบบเดิม)</label>
-                    <input type="password" id="regPass" class="w-full p-3 border rounded-xl mt-1 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="ป้อนรหัสผ่าน">
+                    <label class="block text-sm font-semibold text-gray-700">รหัสผ่าน (Profile Code)</label>
+                    <input type="password" id="regPass" class="w-full p-4 border rounded-xl mt-1 focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50" placeholder="ระบุรหัสประจำตัวของคุณ">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700">อีเมลสำหรับแจ้งเตือน</label>
-                    <input type="email" id="regEmail" class="w-full p-3 border rounded-xl mt-1 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="example@email.com">
+                    <label class="block text-sm font-semibold text-gray-700">อีเมลสำหรับรับแจ้งเตือน</label>
+                    <input type="email" id="regEmail" class="w-full p-4 border rounded-xl mt-1 focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50" placeholder="yourname@hrientec.com">
                 </div>
-                <button onclick="register()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 transition">ลงทะเบียนสวมสิทธิ์</button>
+                <button onclick="register()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 active:scale-95 transition-all mt-4">
+                    <i class="fas fa-id-card mr-2"></i> ลงทะเบียนสวมสิทธิ์
+                </button>
             </div>
         </div>
 
@@ -70,17 +76,19 @@
                 <div class="bg-green-100 text-green-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i class="fas fa-check-double text-3xl"></i>
                 </div>
-                <h3 class="text-lg font-bold text-gray-800">ไม่มีรายการรออนุมัติ</h3>
-                <p class="text-gray-500">คุณได้ตรวจสอบครบทุกรายการแล้ว</p>
-                <button onclick="fetchTask()" class="mt-4 text-blue-600 font-semibold underline">รีเฟรชข้อมูล</button>
+                <h3 class="text-lg font-bold text-gray-800">ตรวจสอบเรียบร้อยแล้ว</h3>
+                <p class="text-gray-500">ไม่มีรายการรออนุมัติที่ตรงกับชื่อของคุณ</p>
+                <button onclick="fetchTask()" class="mt-6 bg-white border-2 border-blue-600 text-blue-600 px-6 py-2 rounded-full font-bold hover:bg-blue-50 transition">
+                    <i class="fas fa-sync-alt mr-2"></i> รีเฟรชข้อมูล
+                </button>
             </div>
         </div>
     </main>
 
     <script>
         // --- CONFIGURATION ---
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbyKMwydsv1JPPjN0SNWKsWg3FFnmFuIMppjbJG_F75ssy49WHFcyKqGQE2RFyyLtzPs/exec'; // วาง URL ที่ได้จาก Deploy GAS
-        const LIFF_ID = '2009016720-UwO1laLB';         // วาง LIFF ID ของคุณ
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbyKMwydsv1JPPjN0SNWKsWg3FFnmFuIMppjbJG_F75ssy49WHFcyKqGQE2RFyyLtzPs/exec'; 
+        const LIFF_ID = '2009016720-UwO1laLB'; 
         
         let currentUser = {
             lineUid: '',
@@ -103,7 +111,8 @@
 
                 await checkUser();
             } catch (err) {
-                Swal.fire('Error', 'LIFF Init Failed: ' + err, 'error');
+                console.error(err);
+                Swal.fire('Error', 'ไม่สามารถเชื่อมต่อ LINE ได้: ' + err, 'error');
             } finally {
                 showLoading(false);
             }
@@ -113,7 +122,7 @@
             const res = await callApi({ action: 'checkUser', lineUid: currentUser.lineUid });
             if (res.status === 'found') {
                 currentUser.approverName = res.approverName;
-                document.getElementById('approverDisplay').innerText = `คุณ: ${res.approverName}`;
+                document.getElementById('approverDisplay').innerText = `ผู้อนุมัติ: ${res.approverName}`;
                 document.getElementById('regSection').classList.add('hidden');
                 document.getElementById('approvalSection').classList.remove('hidden');
                 fetchTask();
@@ -123,9 +132,9 @@
         }
 
         async function register() {
-            const pass = document.getElementById('regPass').value;
-            const email = document.getElementById('regEmail').value;
-            if (!pass || !email) return Swal.fire('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบ', 'warning');
+            const pass = document.getElementById('regPass').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            if (!pass || !email) return Swal.fire('แจ้งเตือน', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'warning');
 
             showLoading(true);
             const res = await callApi({
@@ -138,9 +147,14 @@
             showLoading(false);
 
             if (res.status === 'success') {
-                Swal.fire('สำเร็จ', 'ลงทะเบียนสวมสิทธิ์เรียบร้อย', 'success').then(checkUser);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'ลงทะเบียนสำเร็จ',
+                    text: `ยินดีต้อนรับคุณ ${res.approverName}`,
+                    timer: 2000
+                }).then(checkUser);
             } else {
-                Swal.fire('ล้มเหลว', res.message, 'error');
+                Swal.fire('ล้มเหลว', res.message || 'รหัสผ่านไม่ถูกต้อง', 'error');
             }
         }
 
@@ -165,35 +179,37 @@
         function renderTask(task) {
             const container = document.getElementById('taskContent');
             
-            let itemsHtml = task.details.map(item => {
-                // สร้าง URL รูปภาพจาก Google Drive ID
-                // หมายเหตุ: ไฟล์ใน Drive ต้องตั้งค่าเป็น Anyone with link หรือระบบที่รัน GAS ต้องมีสิทธิ์เข้าถึง
-                const imageUrl = item.photoId ? `https://drive.google.com/thumbnail?id=${item.photoId}&sz=w400` : '';
+            let itemsHtml = task.details.map((item, idx) => {
+                // ใช้ URL สำหรับขยายรูป (uc?id=...) และ Thumb (thumbnail?id=...)
+                const thumbUrl = item.photoId ? `https://drive.google.com/thumbnail?id=${item.photoId}&sz=w400` : '';
                 
                 return `
-                <div class="p-3 bg-gray-50 rounded-lg border border-gray-100 space-y-3">
+                <div class="p-3 bg-white rounded-xl border border-gray-100 shadow-sm space-y-3">
                     <div class="flex items-center space-x-3">
-                        <div class="bg-blue-100 text-blue-600 w-10 h-10 rounded-lg flex items-center justify-center font-bold flex-shrink-0">
+                        <div class="bg-blue-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">
                             ${item.qty}
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold truncate">${item.description}</p>
-                            <p class="text-[10px] text-gray-500">เจ้าของ: ${item.owner}</p>
+                            <p class="text-sm font-bold text-gray-800 truncate">${item.description}</p>
+                            <p class="text-[10px] text-gray-500 italic">เจ้าของทรัพย์สิน: ${item.owner}</p>
                         </div>
                     </div>
                     ${item.photoId ? `
-                        <div class="relative w-full h-40 bg-gray-200 rounded-lg overflow-hidden border">
-                            <img src="${imageUrl}" 
+                        <div class="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden group border border-gray-200">
+                            <img src="${thumbUrl}" 
                                  class="w-full h-full object-cover img-preview" 
                                  onclick="previewFullImage('${item.photoId}')"
-                                 onerror="this.src='https://via.placeholder.com/400x200?text=Image+Not+Found'">
-                            <div class="absolute bottom-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-[10px]">
-                                <i class="fas fa-search-plus mr-1"></i> แตะเพื่อขยาย
+                                 onerror="this.src='https://via.placeholder.com/400x300?text=รูปภาพไม่รองรับหรือถูกลบ'">
+                            <div class="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-active:opacity-100 transition-opacity">
+                                <i class="fas fa-search-plus text-white text-3xl"></i>
+                            </div>
+                            <div class="absolute bottom-2 right-2 bg-black/60 text-white px-2 py-1 rounded text-[9px] font-bold">
+                                <i class="fas fa-expand-arrows-alt mr-1"></i> แตะเพื่อขยายรูปภาพ
                             </div>
                         </div>
                     ` : `
-                        <div class="py-2 px-3 bg-gray-100 rounded text-[10px] text-gray-400 text-center italic">
-                            ไม่มีรูปภาพประกอบ
+                        <div class="py-4 bg-gray-50 rounded-lg text-[10px] text-gray-400 text-center border-2 border-dashed border-gray-100">
+                            <i class="fas fa-image-slash mb-1 block text-lg"></i> ไม่มีรูปภาพประกอบ
                         </div>
                     `}
                 </div>
@@ -201,66 +217,77 @@
             }).join('');
 
             container.innerHTML = `
-                <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-200">
-                    <div class="bg-blue-600 p-4 text-white">
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs bg-blue-500 px-2 py-1 rounded font-bold">เลขที่: ${task.docno}</span>
-                            <span class="text-xs">${task.docdate}</span>
+                <div class="task-card bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
+                    <div class="bg-gradient-to-r from-blue-800 to-blue-900 p-4 text-white">
+                        <div class="flex justify-between items-center mb-1">
+                            <h2 class="text-xs bg-blue-500/50 px-2 py-0.5 rounded-full font-bold">DOC: ${task.docno}</h2>
+                            <span class="text-[10px] opacity-80"><i class="far fa-calendar-alt mr-1"></i>${task.docdate}</span>
                         </div>
+                        <p class="text-lg font-bold mt-1">${task.transType}</p>
                     </div>
+                    
                     <div class="p-4 space-y-4">
                         <div class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
-                            <div class="col-span-2 border-l-4 border-blue-500 pl-2 bg-blue-50 py-1">
-                                <label class="text-gray-500 text-[10px] uppercase font-bold">ประเภทรายการ</label>
-                                <p class="font-bold text-blue-800">${task.transType}</p>
+                            <div><label class="text-gray-400 text-[9px] uppercase font-bold block mb-0.5">ชื่อผู้ขอ</label><p class="font-bold text-gray-800">${task.reqName}</p></div>
+                            <div><label class="text-gray-400 text-[9px] uppercase font-bold block mb-0.5">บริษัท/แผนก</label><p class="font-bold text-gray-800">${task.reqCompany}</p></div>
+                            <div><label class="text-gray-400 text-[9px] uppercase font-bold block mb-0.5">ทะเบียนรถ</label><p class="font-bold text-gray-800">${task.carNo}</p></div>
+                            <div><label class="text-gray-400 text-[9px] uppercase font-bold block mb-0.5">ประเภทรถ</label><p class="font-bold text-gray-800">${task.carType}</p></div>
+                            <div class="col-span-2 bg-gray-50 p-3 rounded-lg border-l-4 border-gray-200">
+                                <label class="text-gray-400 text-[9px] uppercase font-bold block mb-1">วัตถุประสงค์การเคลื่อนย้าย</label>
+                                <p class="text-gray-700 text-sm leading-relaxed">${task.purpose}</p>
                             </div>
-                            <div><label class="text-gray-500 text-[10px] uppercase font-bold">ผู้ขอ</label><p class="font-semibold">${task.reqName}</p></div>
-                            <div><label class="text-gray-500 text-[10px] uppercase font-bold">แผนก</label><p class="font-semibold">${task.reqCompany}</p></div>
-                            <div><label class="text-gray-500 text-[10px] uppercase font-bold">ทะเบียนรถ</label><p class="font-semibold">${task.carNo}</p></div>
-                            <div><label class="text-gray-500 text-[10px] uppercase font-bold">ประเภทรถ</label><p class="font-semibold">${task.carType}</p></div>
-                            <div class="col-span-2"><label class="text-gray-500 text-[10px] uppercase font-bold">วัตถุประสงค์</label><p class="text-gray-700">${task.purpose}</p></div>
                         </div>
                         
-                        <div class="border-t pt-4">
-                            <h4 class="text-xs font-bold text-blue-900 mb-3 uppercase flex items-center">
-                                <i class="fas fa-boxes mr-2"></i> รายการทรัพย์สินและรูปภาพ
+                        <div class="pt-4">
+                            <h4 class="text-xs font-black text-blue-900 mb-3 uppercase flex items-center">
+                                <i class="fas fa-clipboard-list mr-2"></i> รายการสิ่งของ (${task.details.length})
                             </h4>
-                            <div class="space-y-3">${itemsHtml}</div>
+                            <div class="space-y-4">${itemsHtml}</div>
                         </div>
                     </div>
                     
-                    <div class="p-4 bg-gray-50 border-t flex space-x-3">
-                        <button onclick="approveAction('${task.docno}', 'Rejected')" class="flex-1 bg-white border-2 border-red-500 text-red-500 font-bold py-3 rounded-xl active:scale-95 transition">ไม่อนุมัติ</button>
-                        <button onclick="approveAction('${task.docno}', 'Approved')" class="flex-1 bg-green-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-95 transition">อนุมัติรายการ</button>
+                    <div class="p-4 bg-gray-50 border-t grid grid-cols-2 gap-3">
+                        <button onclick="approveAction('${task.docno}', 'Rejected')" class="bg-white border-2 border-red-500 text-red-600 font-bold py-4 rounded-2xl active:scale-95 transition-all shadow-sm">
+                            <i class="fas fa-times-circle mr-2"></i> ไม่อนุมัติ
+                        </button>
+                        <button onclick="approveAction('${task.docno}', 'Approved')" class="bg-green-600 text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-all">
+                            <i class="fas fa-check-circle mr-2"></i> อนุมัติ
+                        </button>
                     </div>
                 </div>
             `;
         }
 
-        // ฟังก์ชันขยายรูปภาพ
+        // ฟังก์ชันขยายรูปภาพ - ปรับปรุง URL ให้แสดงผลได้ดีขึ้น
         function previewFullImage(id) {
             Swal.fire({
-                imageUrl: `https://drive.google.com/uc?id=${id}`,
-                imageAlt: 'ทรัพย์สิน',
-                showCloseButton: true,
+                imageUrl: `https://drive.google.com/uc?export=view&id=${id}`,
+                imageAlt: 'Property Image',
                 showConfirmButton: false,
-                width: 'auto',
+                showCloseButton: true,
+                width: '100%',
                 padding: '0',
-                background: 'transparent',
-                backdrop: `rgba(0,0,0,0.9)`
+                background: 'rgba(0,0,0,0.85)',
+                imageWidth: 'auto',
+                imageHeight: 'auto',
+                backdrop: true,
+                customClass: {
+                    image: 'max-w-full h-auto rounded-lg'
+                }
             });
         }
 
         async function approveAction(docno, status) {
-            const confirmText = status === 'Approved' ? 'ยืนยันการอนุมัติ?' : 'ยืนยันการปฏิเสธ?';
+            const isApproved = status === 'Approved';
             const result = await Swal.fire({
-                title: 'ยืนยันรายการ',
-                text: confirmText,
-                icon: 'question',
+                title: isApproved ? 'ยืนยันอนุมัติ?' : 'ไม่รับรองรายการ?',
+                text: `คุณกำลังตัดสินใจ ${isApproved ? 'อนุมัติ' : 'ไม่อนุมัติ'} รายการเลขที่ ${docno}`,
+                icon: isApproved ? 'success' : 'warning',
                 showCancelButton: true,
-                confirmButtonColor: status === 'Approved' ? '#059669' : '#dc2626',
-                cancelButtonText: 'ยกเลิก',
-                confirmButtonText: 'ตกลง'
+                confirmButtonColor: isApproved ? '#059669' : '#dc2626',
+                cancelButtonText: 'ย้อนกลับ',
+                confirmButtonText: 'ยืนยัน',
+                reverseButtons: true
             });
 
             if (result.isConfirmed) {
@@ -268,8 +295,17 @@
                 const res = await callApi({ action: 'processApproval', docno, status });
                 showLoading(false);
                 if (res.status === 'success') {
-                    Swal.fire({ icon: 'success', title: 'บันทึกเรียบร้อย', showConfirmButton: false, timer: 1000 });
+                    Swal.fire({ 
+                        icon: 'success', 
+                        title: 'ดำเนินการเรียบร้อย', 
+                        showConfirmButton: false, 
+                        timer: 1500,
+                        toast: true,
+                        position: 'top-end'
+                    });
                     fetchTask();
+                } else {
+                    Swal.fire('ล้มเหลว', res.message || 'บันทึกไม่สำเร็จ', 'error');
                 }
             }
         }
@@ -282,7 +318,8 @@
                 });
                 return await response.json();
             } catch (err) {
-                return { status: 'error', message: err.toString() };
+                console.error(err);
+                return { status: 'error', message: 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้' };
             }
         }
 
