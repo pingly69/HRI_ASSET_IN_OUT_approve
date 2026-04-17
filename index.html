@@ -8,7 +8,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     
-    <title>อนุมัติใบผ่าน - Property Pass</title>
+    <title>ระบบอนุมัติ - Property Pass</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -46,14 +46,14 @@
 
     <div id="loading" class="loading-overlay">
         <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-600 mb-4"></div>
-        <p class="text-gray-600 font-semibold text-sm">กำลังโหลดข้อมูล...</p>
+        <p class="text-gray-600 font-semibold text-sm">กำลังประมวลผลการอนุมัติ...</p>
     </div>
 
     <header class="bg-blue-900 text-white p-4 shadow-lg sticky top-0 z-50">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <div>
-                <h1 class="font-bold text-lg leading-none mb-1">อนุมัติใบผ่านเข้าออก</h1>
-                <p id="approverDisplay" class="text-[10px] opacity-80 uppercase tracking-wider">Authentication Required</p>
+                <h1 class="font-bold text-lg leading-none mb-1">ระบบอนุมัติย้ายสิ่งของ</h1>
+                <p id="approverDisplay" class="text-[10px] opacity-80 uppercase tracking-wider font-bold">Checking Credentials...</p>
             </div>
             <img id="userImg" class="w-10 h-10 rounded-full border-2 border-white shadow-sm" src="https://via.placeholder.com/40">
         </div>
@@ -61,25 +61,25 @@
 
     <main class="max-w-md mx-auto p-4">
         <!-- Section 0: Registration Form -->
-        <div id="regSection" class="hidden bg-white rounded-2xl shadow-xl p-6 mt-10">
+        <div id="regSection" class="hidden bg-white rounded-2xl shadow-xl p-6 mt-10 border border-gray-100">
             <div class="text-center mb-6">
                 <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i class="fas fa-user-shield text-3xl text-blue-600"></i>
                 </div>
                 <h2 class="text-xl font-bold text-gray-800">ลงทะเบียนผู้อนุมัติ</h2>
-                <p class="text-gray-500 text-xs">ระบุรหัสประจำตัวและอีเมลเพื่อยืนยันสวมสิทธิ์</p>
+                <p class="text-gray-500 text-xs">ระบุรหัสประจำตัวและอีเมลเพื่อยืนยันการสวมสิทธิ์</p>
             </div>
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-700 uppercase mb-1">รหัสผ่าน (Profile Code)</label>
-                    <input type="password" id="regPass" class="w-full p-4 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-mono text-center" placeholder="••••••">
+                    <input type="password" id="regPass" class="w-full p-4 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-mono text-center tracking-widest" placeholder="••••••">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">อีเมลแจ้งเตือน</label>
-                    <input type="email" id="regEmail" class="w-full p-4 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 text-center" placeholder="yourname@hrientec.com">
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">อีเมลผู้อนุมัติ (เพื่อรับแจ้งเตือน)</label>
+                    <input type="email" id="regEmail" class="w-full p-4 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 text-center" placeholder="approver@hrientec.com">
                 </div>
                 <button onclick="register()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 active:scale-95 transition-all mt-4">
-                    <i class="fas fa-id-badge mr-2"></i> ยืนยันสวมสิทธิ์ผู้อนุมัติ
+                    <i class="fas fa-fingerprint mr-2"></i> ยืนยันตัวตนเพื่ออนุมัติ
                 </button>
             </div>
         </div>
@@ -87,17 +87,17 @@
         <!-- Section 1: Approval Card -->
         <div id="approvalSection" class="hidden space-y-4">
             <div id="taskContent" class="space-y-4">
-                <!-- Task items will be inserted here -->
+                <!-- ข้อมูลรายการจะแสดงที่นี่ -->
             </div>
             
             <div id="noTask" class="hidden text-center py-24">
-                <div class="bg-blue-50 text-blue-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-100">
-                    <i class="fas fa-tasks text-3xl"></i>
+                <div class="bg-blue-50 text-blue-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-100 shadow-inner">
+                    <i class="fas fa-check-double text-3xl"></i>
                 </div>
-                <h3 class="text-lg font-bold text-gray-800">ไม่มีรายการค้างอนุมัติ</h3>
-                <p class="text-gray-400 text-xs">คุณได้จัดการรายการทั้งหมดในคิวเรียบร้อยแล้ว</p>
+                <h3 class="text-lg font-bold text-gray-800">จัดการข้อมูลเรียบร้อย</h3>
+                <p class="text-gray-400 text-xs">ไม่มีรายการค้างอนุมัติสำหรับคุณในขณะนี้</p>
                 <button onclick="fetchTask()" class="mt-8 bg-blue-600 text-white px-8 py-3 rounded-full font-bold shadow-lg active:scale-95 transition">
-                    <i class="fas fa-redo-alt mr-2"></i> รีเฟรชรายการ
+                    <i class="fas fa-sync-alt mr-2"></i> ตรวจสอบคิวใหม่
                 </button>
             </div>
         </div>
@@ -130,7 +130,7 @@
                 await checkUser();
             } catch (err) {
                 console.error(err);
-                Swal.fire('Error', 'ไม่สามารถเชื่อมต่อ LINE: ' + err, 'error');
+                Swal.fire('Connection Error', 'ไม่สามารถเชื่อมต่อระบบ LINE ได้: ' + err, 'error');
             } finally {
                 showLoading(false);
             }
@@ -140,7 +140,7 @@
             const res = await callApi({ action: 'checkUser', lineUid: currentUser.lineUid });
             if (res.status === 'found') {
                 currentUser.approverName = res.approverName;
-                document.getElementById('approverDisplay').innerText = `ผู้อนุมัติ: ${res.approverName}`;
+                document.getElementById('approverDisplay').innerText = `คุณ: ${res.approverName}`;
                 document.getElementById('regSection').classList.add('hidden');
                 document.getElementById('approvalSection').classList.remove('hidden');
                 fetchTask();
@@ -152,7 +152,7 @@
         async function register() {
             const pass = document.getElementById('regPass').value.trim();
             const email = document.getElementById('regEmail').value.trim();
-            if (!pass || !email) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอกรหัสผ่านและอีเมล', 'warning');
+            if (!pass || !email) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณาระบุรหัสผ่านและอีเมล', 'warning');
 
             showLoading(true);
             const res = await callApi({
@@ -167,13 +167,13 @@
             if (res.status === 'success') {
                 Swal.fire({
                     icon: 'success',
-                    title: 'สวมสิทธิ์สำเร็จ',
-                    text: `เข้าใช้งานในชื่อคุณ ${res.approverName}`,
+                    title: 'ลงทะเบียนสำเร็จ',
+                    text: `คุณเริ่มอนุมัติงานในชื่อ ${res.approverName}`,
                     timer: 1500,
                     showConfirmButton: false
                 }).then(checkUser);
             } else {
-                Swal.fire('ล้มเหลว', res.message || 'รหัสผ่านไม่ถูกต้อง', 'error');
+                Swal.fire('แจ้งเตือน', res.message || 'รหัสผ่านไม่ถูกต้อง', 'error');
             }
         }
 
@@ -199,34 +199,33 @@
             const container = document.getElementById('taskContent');
             
             let itemsHtml = task.details.map((item, idx) => {
-                // ใช้ sz=w400 สำหรับหน้าพรีวิวเพื่อความเร็วในการโหลด
-                const thumbUrl = item.photoId ? `https://drive.google.com/thumbnail?id=${item.photoId}&sz=w600` : '';
+                const thumbUrl = item.photoId ? `https://drive.google.com/thumbnail?id=${item.photoId}&sz=w800` : '';
                 
                 return `
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-3">
                     <div class="flex items-center space-x-3">
-                        <div class="bg-blue-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0">
+                        <div class="bg-blue-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-sm">
                             ${item.qty}
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-bold text-gray-800 leading-none mb-1">${item.description}</p>
-                            <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wide">Owner: ${item.owner}</p>
+                            <p class="text-[9px] text-gray-400 font-black uppercase tracking-widest">OWNER: ${item.owner}</p>
                         </div>
                     </div>
                     ${item.photoId ? `
-                        <div class="relative group">
+                        <div class="relative group rounded-xl overflow-hidden border border-gray-100 bg-gray-50">
                             <img src="${thumbUrl}" 
-                                 class="img-full-view border border-gray-100" 
+                                 class="img-full-view" 
                                  onclick="previewFullImage('${item.photoId}')"
-                                 onerror="this.src='https://via.placeholder.com/400x300?text=ไม่มีรูปภาพ'">
-                            <div class="absolute bottom-2 right-2 bg-black/60 text-white px-3 py-1.5 rounded-lg text-[9px] font-bold backdrop-blur-sm flex items-center">
-                                <i class="fas fa-expand mr-1.5"></i> แตะเพื่อขยายรูปภาพ
+                                 onerror="this.src='https://via.placeholder.com/400x300?text=ไม่มีรูปภาพประกอบ'">
+                            <div class="absolute bottom-2 right-2 bg-black/60 text-white px-3 py-1.5 rounded-lg text-[9px] font-bold backdrop-blur-md border border-white/20 flex items-center">
+                                <i class="fas fa-expand-arrows-alt mr-2"></i> แตะเพื่อขยายรูป
                             </div>
                         </div>
                     ` : `
-                        <div class="py-10 bg-gray-50 rounded-xl text-center border-2 border-dashed border-gray-100">
-                            <i class="fas fa-camera text-gray-200 text-2xl mb-2"></i>
-                            <p class="text-[10px] text-gray-300 font-bold">ไม่มีรูปภาพประกอบรายการ</p>
+                        <div class="py-12 bg-gray-50 rounded-xl text-center border-2 border-dashed border-gray-100">
+                            <i class="fas fa-camera text-gray-200 text-3xl mb-2"></i>
+                            <p class="text-[10px] text-gray-300 font-bold uppercase tracking-widest">No Image Provided</p>
                         </div>
                     `}
                 </div>
@@ -235,11 +234,11 @@
 
             container.innerHTML = `
                 <div class="task-card space-y-4">
-                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-                        <div class="bg-blue-900 p-5 text-white">
-                            <div class="flex justify-between items-center mb-3">
-                                <span class="text-[10px] bg-white/20 px-3 py-1 rounded-full font-mono font-bold tracking-widest">DOC: ${task.docno}</span>
-                                <span class="text-[10px] opacity-80 font-bold"><i class="far fa-clock mr-1"></i>${task.docdate}</span>
+                    <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+                        <div class="bg-gradient-to-br from-blue-900 to-indigo-950 p-6 text-white relative">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-[10px] bg-white/10 px-3 py-1 rounded-full font-mono font-bold border border-white/20 shadow-inner">DOC: ${task.docno}</span>
+                                <span class="text-[10px] opacity-75 font-bold"><i class="far fa-calendar-alt mr-1"></i>${task.docdate}</span>
                             </div>
                             <h2 class="text-xl font-bold leading-tight">${task.transType}</h2>
                         </div>
@@ -248,49 +247,48 @@
                             <div class="grid grid-cols-2 gap-x-6 gap-y-5 text-sm">
                                 <div><label class="text-gray-400 text-[9px] font-black block mb-1 uppercase tracking-wider">ผู้ขออนุญาต</label><p class="font-bold text-gray-800">${task.reqName}</p></div>
                                 <div><label class="text-gray-400 text-[9px] font-black block mb-1 uppercase tracking-wider">แผนก/หน่วยงาน</label><p class="font-bold text-gray-800">${task.reqCompany}</p></div>
+                                <div class="col-span-2 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                                     <label class="text-gray-400 text-[9px] font-black block mb-1 uppercase tracking-wider">อีเมลผู้ขอ (Requester Email)</label>
+                                     <p class="font-bold text-blue-700">${task.reqEmail || '-'}</p>
+                                </div>
                                 <div><label class="text-gray-400 text-[9px] font-black block mb-1 uppercase tracking-wider">ทะเบียนรถ</label><p class="font-bold text-gray-800">${task.carNo}</p></div>
                                 <div><label class="text-gray-400 text-[9px] font-black block mb-1 uppercase tracking-wider">ประเภทรถ</label><p class="font-bold text-gray-800">${task.carType}</p></div>
-                                <div class="col-span-2 bg-blue-50/40 p-4 rounded-2xl border border-blue-100/30">
-                                    <label class="text-blue-500 text-[9px] font-black block mb-1 uppercase tracking-wider">วัตถุประสงค์</label>
+                                <div class="col-span-2 bg-blue-50/50 p-4 rounded-2xl border border-blue-100/30">
+                                    <label class="text-blue-500 text-[9px] font-black block mb-1 uppercase tracking-wider">วัตถุประสงค์การย้ายสิ่งของ</label>
                                     <p class="text-gray-700 text-sm leading-snug font-medium">${task.purpose}</p>
                                 </div>
                             </div>
                             
                             <div>
-                                <h4 class="text-[10px] font-black text-blue-900 mb-4 uppercase flex items-center tracking-[0.2em]">
-                                    <i class="fas fa-list-ul mr-2 text-xs"></i> รายการสิ่งของ (${task.details.length})
+                                <h4 class="text-[10px] font-black text-blue-900 mb-4 uppercase flex items-center tracking-[0.2em] border-b pb-2 border-gray-100">
+                                    <i class="fas fa-boxes mr-2 text-xs"></i> รายการสิ่งของ (${task.details.length})
                                 </h4>
                                 <div class="space-y-4">${itemsHtml}</div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-4 pb-6 px-1">
+                    <div class="grid grid-cols-2 gap-4 pb-10 px-1">
                         <button onclick="approveAction('${task.docno}', 'Rejected')" class="bg-white border-2 border-red-500 text-red-600 font-bold py-5 rounded-2xl shadow-sm active:scale-95 transition-all flex flex-col items-center">
-                            <i class="fas fa-times-circle text-lg mb-1"></i>
+                            <i class="fas fa-times-circle text-xl mb-1 text-red-500"></i>
                             <span class="text-sm">ไม่อนุมัติ</span>
                         </button>
-                        <button onclick="approveAction('${task.docno}', 'Approved')" class="bg-green-600 text-white font-bold py-5 rounded-2xl shadow-xl active:scale-95 transition-all flex flex-col items-center">
-                            <i class="fas fa-check-circle text-lg mb-1"></i>
-                            <span class="text-sm font-bold">อนุมัติรายการ</span>
+                        <button onclick="approveAction('${task.docno}', 'Approved')" class="bg-green-600 text-white font-bold py-5 rounded-2xl shadow-xl active:scale-95 transition-all flex flex-col items-center border-b-4 border-green-700">
+                            <i class="fas fa-check-circle text-xl mb-1"></i>
+                            <span class="text-sm font-bold uppercase tracking-widest">APPROVE</span>
                         </button>
                     </div>
                 </div>
             `;
         }
 
-        // ฟังก์ชันขยายรูปภาพ - ปรับปรุงให้รองรับ LINE Browser
         function previewFullImage(id) {
-            // ใช้ uc สำหรับแสดงภาพขนาดเต็ม
             const fullUrl = `https://drive.google.com/uc?id=${id}`;
-            
             Swal.fire({
-                html: `<div class="p-0 m-0 overflow-hidden bg-black flex flex-col items-center justify-center min-h-[50vh]">
-                         <img src="${fullUrl}" class="max-w-full h-auto block" 
-                              style="border-radius:0;" 
-                              onerror="this.src='https://via.placeholder.com/800x600?text=พบข้อผิดพลาดในการโหลดรูป'">
-                         <div class="p-4 w-full bg-white flex justify-center border-t">
-                            <a href="${fullUrl}" target="_blank" class="bg-blue-600 text-white px-4 py-2 rounded-full text-xs font-bold no-underline flex items-center">
+                html: `<div class="p-0 m-0 bg-black rounded-lg overflow-hidden min-h-[50vh] flex flex-col">
+                         <img src="${fullUrl}" class="max-w-full h-auto block mx-auto" onerror="this.src='https://via.placeholder.com/800x600?text=Error+Loading+Image'">
+                         <div class="bg-white p-4 flex justify-center">
+                            <a href="${fullUrl}" target="_blank" class="bg-blue-600 text-white px-6 py-2 rounded-full text-xs font-bold no-underline shadow-lg flex items-center">
                                 <i class="fas fa-external-link-alt mr-2"></i> เปิดดูไฟล์ต้นฉบับ
                             </a>
                          </div>
@@ -298,32 +296,24 @@
                 showConfirmButton: false,
                 showCloseButton: true,
                 width: '100%',
-                margin: '0',
                 padding: '0',
                 background: '#000',
-                backdrop: `rgba(0,0,0,0.95)`,
-                customClass: {
-                    popup: 'rounded-none overflow-hidden',
-                    htmlContainer: 'p-0 m-0'
-                }
+                backdrop: `rgba(0,0,0,0.9)`,
+                customClass: { popup: 'rounded-2xl', htmlContainer: 'p-0 m-0' }
             });
         }
 
         async function approveAction(docno, status) {
             const isApproved = status === 'Approved';
             const result = await Swal.fire({
-                title: isApproved ? 'ยืนยันอนุมัติ?' : 'ปฏิเสธคำขอ?',
-                text: `คุณกำลังดำเนินการ ${isApproved ? 'อนุมัติ' : 'ไม่อนุมัติ'} รายการ ${docno}`,
-                icon: isApproved ? 'question' : 'warning',
+                title: isApproved ? 'ยืนยันการอนุมัติ?' : 'ปฏิเสธคำขอ?',
+                text: `ระบบจะทำการ ${isApproved ? 'สร้างใบอนุมัติ PDF และส่งเมลหาผู้ขอ' : 'ปฏิเสธรายการ'} โดยทันที`,
+                icon: isApproved ? 'success' : 'warning',
                 showCancelButton: true,
                 confirmButtonColor: isApproved ? '#059669' : '#dc2626',
                 cancelButtonText: 'ยกเลิก',
-                confirmButtonText: 'ยืนยัน',
-                reverseButtons: true,
-                customClass: {
-                    confirmButton: 'rounded-xl px-8 py-3',
-                    cancelButton: 'rounded-xl px-8 py-3'
-                }
+                confirmButtonText: 'ยืนยันดำเนินการ',
+                reverseButtons: true
             });
 
             if (result.isConfirmed) {
@@ -333,11 +323,11 @@
                 if (res.status === 'success') {
                     Swal.fire({ 
                         icon: 'success', 
-                        title: 'บันทึกสำเร็จ', 
+                        title: 'ดำเนินการสำเร็จ', 
+                        text: isApproved ? 'สร้าง PDF และส่งเมลหาผู้ขอแล้ว' : 'ปฏิเสธรายการเรียบร้อย',
                         showConfirmButton: false, 
-                        timer: 1200,
-                        toast: true,
-                        position: 'top-end'
+                        timer: 2000,
+                        toast: false
                     });
                     fetchTask();
                 } else {
@@ -348,10 +338,7 @@
 
         async function callApi(payload) {
             try {
-                const response = await fetch(GAS_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(payload)
-                });
+                const response = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
                 return await response.json();
             } catch (err) {
                 console.error(err);
@@ -359,9 +346,7 @@
             }
         }
 
-        function showLoading(show) {
-            document.getElementById('loading').style.display = show ? 'flex' : 'none';
-        }
+        function showLoading(show) { document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
 
         window.onload = init;
     </script>
